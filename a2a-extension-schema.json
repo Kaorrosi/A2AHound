@@ -1,0 +1,258 @@
+{
+  "schema": {
+    "name": "A2AHound",
+    "display_name": "A2A Agent Ecosystem",
+    "version": "v1.0.0",
+    "namespace": "A2A"
+  },
+  "node_kinds": [
+    {
+      "name": "A2A_Ecosystem",
+      "display_name": "A2A Ecosystem",
+      "description": "Root of a collected A2A agent ecosystem (one collection scope, such as an organization, a registry or a set of discovered domains). Plays the role a Domain plays in Active Directory.",
+      "is_display_kind": true,
+      "icon": "diagram-project",
+      "color": "#5B4B8A"
+    },
+    {
+      "name": "A2A_Provider",
+      "display_name": "A2A Provider",
+      "description": "Organization that publishes one or more agents, from AgentCard.provider (organization, url).",
+      "is_display_kind": true,
+      "icon": "building",
+      "color": "#6C7A89"
+    },
+    {
+      "name": "A2A_Agent",
+      "display_name": "A2A Agent",
+      "description": "An A2A agent described by an Agent Card (/.well-known/agent-card.json, or /.well-known/agent.json before v1.0). Carries the card's top-level fields, capability flags and default input/output modes as properties.",
+      "is_display_kind": true,
+      "icon": "robot",
+      "color": "#E8743B"
+    },
+    {
+      "name": "A2A_Interface",
+      "display_name": "A2A Interface",
+      "description": "One endpoint an agent is reachable at, from AgentCard.supportedInterfaces[] (url, protocolBinding, protocolVersion, tenant), or url/preferredTransport/additionalInterfaces[] on pre-v1.0 cards.",
+      "is_display_kind": true,
+      "icon": "plug",
+      "color": "#F2B134"
+    },
+    {
+      "name": "A2A_Host",
+      "display_name": "A2A Host",
+      "description": "A network origin (scheme://host:port) that serves agent interfaces or API operations. The main correlation point between Agent Cards and OpenAPI documents, and the node to mark as owned when a server is compromised.",
+      "is_display_kind": true,
+      "icon": "server",
+      "color": "#4A6FA5"
+    },
+    {
+      "name": "A2A_Skill",
+      "display_name": "A2A Skill",
+      "description": "A capability an agent offers, from AgentCard.skills[] (id, name, description, tags, examples, inputModes, outputModes, securityRequirements).",
+      "is_display_kind": true,
+      "icon": "wand-magic-sparkles",
+      "color": "#3BA272"
+    },
+    {
+      "name": "A2A_Extension",
+      "display_name": "A2A Protocol Extension",
+      "description": "A protocol extension an agent supports, from AgentCard.capabilities.extensions[] (uri, description, required, params). Keyed by uri so agents sharing an extension converge on one node.",
+      "is_display_kind": true,
+      "icon": "puzzle-piece",
+      "color": "#8E7CC3"
+    },
+    {
+      "name": "A2A_SecurityScheme",
+      "display_name": "A2A Security Scheme",
+      "description": "An authentication mechanism declared in AgentCard.securitySchemes or OpenAPI components.securitySchemes: apiKey, http (basic/bearer), oauth2, openIdConnect or mutualTls.",
+      "is_display_kind": true,
+      "icon": "shield-halved",
+      "color": "#C0392B"
+    },
+    {
+      "name": "A2A_AuthorizationServer",
+      "display_name": "A2A Authorization Server",
+      "description": "An OAuth 2.0 / OpenID Connect issuer, derived from tokenUrl, authorizationUrl, oauth2MetadataUrl or openIdConnectUrl. Agents and APIs that trust the same issuer converge on one node, the way computers converge on a Domain Controller.",
+      "is_display_kind": true,
+      "icon": "building-shield",
+      "color": "#922B21"
+    },
+    {
+      "name": "A2A_Scope",
+      "display_name": "A2A OAuth Scope",
+      "description": "An OAuth scope issued by an authorization server, from oauth2 flows[].scopes. Keyed by issuer plus scope name.",
+      "is_display_kind": true,
+      "icon": "key",
+      "color": "#D35400"
+    },
+    {
+      "name": "A2A_Client",
+      "display_name": "A2A Client Identity",
+      "description": "A credential-holding identity that calls agents or APIs: an OAuth client, service account, API key holder or mTLS client certificate. Not in Agent Cards themselves; added from IdP exports, gateway config or agent deployment config.",
+      "is_display_kind": true,
+      "icon": "id-card",
+      "color": "#2E86C1"
+    },
+    {
+      "name": "A2A_PublicAccess",
+      "display_name": "Anyone (Unauthenticated)",
+      "description": "Well-known node for unauthenticated callers. Linked to every agent, skill or operation with no security requirement, like Everyone or Anonymous Logon in Active Directory. One per ecosystem.",
+      "is_display_kind": true,
+      "icon": "globe",
+      "color": "#7F8C8D"
+    },
+    {
+      "name": "A2A_SigningKey",
+      "display_name": "A2A Card Signing Key",
+      "description": "A key that signs Agent Cards, from AgentCard.signatures[].protected (decoded JWS header: kid, alg, jku). Keyed by jku plus kid.",
+      "is_display_kind": true,
+      "icon": "signature",
+      "color": "#16A085"
+    },
+    {
+      "name": "A2A_APISpec",
+      "display_name": "OpenAPI Document",
+      "description": "An OpenAPI (openapi.json) document: info.title, info.version, openapi version, servers[], tags[].",
+      "is_display_kind": true,
+      "icon": "file-code",
+      "color": "#1F618D"
+    },
+    {
+      "name": "A2A_APIOperation",
+      "display_name": "API Operation",
+      "description": "One method + path in an OpenAPI document (operationId, summary, tags, deprecated, x-* fields). Keyed by server origin, method and path template.",
+      "is_display_kind": true,
+      "icon": "route",
+      "color": "#2874A6"
+    }
+  ],
+  "relationship_kinds": [
+    {
+      "name": "A2A_Contains",
+      "description": "Structural membership: Ecosystem to Provider, Agent, Host, AuthorizationServer, APISpec and PublicAccess; Provider to Agent.",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_Publishes",
+      "description": "Provider operates the agent (AgentCard.provider). Traversable: whoever controls the provider organization controls its agents.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_HostsInterface",
+      "description": "Host serves this agent interface (interface url origin equals host). Compromising the host compromises the interface.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_ServesAgent",
+      "description": "Interface is a live endpoint of the agent. Control of the interface gives control of the agent's traffic.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_HasSkill",
+      "description": "Agent offers the skill. Whoever can invoke or control the agent can invoke the skill.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_SupportsExtension",
+      "description": "Agent declares the protocol extension in capabilities.extensions[]. Property required marks mandatory extensions.",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_HostsOperation",
+      "description": "Host serves the API operation (OpenAPI servers[] origin equals host).",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_DefinesOperation",
+      "description": "OpenAPI document defines the operation.",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_DescribedBy",
+      "description": "Agent or interface is documented by the OpenAPI document (same origin as servers[], or linked through documentationUrl or an x-openapi field).",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_BackedBy",
+      "description": "Skill is implemented by the API operation, correlated by matching skill id/name/tags to operationId/tags/path, or by explicit mapping. Invoking the skill exercises the operation.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_ProtectedBy",
+      "description": "Agent, skill, interface or operation requires the security scheme (securityRequirements / security). Edge properties: scopes (required scope list) and requirement_group (index of the alternative it belongs to).",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_AuthenticatesTo",
+      "description": "Holding a valid credential for this security scheme grants access to the target agent, skill, interface or operation. Emitted from the scheme for each requirement it satisfies on its own.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_TrustsIssuer",
+      "description": "Security scheme accepts tokens from the authorization server (tokenUrl / openIdConnectUrl / oauth2MetadataUrl issuer).",
+      "is_traversable": false
+    },
+    {
+      "name": "A2A_IssuesTokensFor",
+      "description": "Authorization server mints tokens that this security scheme accepts. Compromising the issuer lets an attacker mint access for every scheme that trusts it.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_DefinesScope",
+      "description": "Authorization server issues the scope.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_GrantsAccessTo",
+      "description": "A token carrying this scope satisfies the scope requirement on the target agent, skill or operation.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_HasScope",
+      "description": "Client identity is allowed to request the scope (from IdP client configuration).",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_HoldsCredential",
+      "description": "Client identity holds a credential for the security scheme (API key, bearer secret, client certificate, client secret).",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_RunsAs",
+      "description": "Agent authenticates outbound calls as this client identity. Compromising the agent yields the client's access, like HasSession in Active Directory.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_CanDelegateTo",
+      "description": "Agent is configured to send tasks to another agent (from orchestrator config, registry links or observed traffic).",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_Anonymous",
+      "description": "Unauthenticated callers can reach the target: an agent, skill, interface or operation with no security requirement, or with an interface served over plain http.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_SignsCard",
+      "description": "Signing key signed the agent's card. Whoever holds the key can forge that agent's identity.",
+      "is_traversable": true
+    },
+    {
+      "name": "A2A_SameAgentAs",
+      "description": "Two agent nodes describe the same deployed agent (for example the public card and the authenticated extended card, or the same card found under two origins).",
+      "is_traversable": false
+    }
+  ],
+  "environments": [
+    {
+      "environment_kind": "A2A_Ecosystem",
+      "source_kind": "A2ABase",
+      "principal_kinds": [
+        "A2A_Agent",
+        "A2A_Client",
+        "A2A_PublicAccess"
+      ]
+    }
+  ]
+}
