@@ -1,0 +1,60 @@
+{
+  "queries": [
+    {
+      "query_key": "6077bfed-9828-43f3-b577-acc95c78e2ba",
+      "name": "Extension graph",
+      "description": "Show edges in the A2A extension.",
+      "category": "Inventory",
+      "query": "MATCH p=(a)-[r]->(b) WHERE type(r) STARTS WITH \"A2A_\" RETURN p"
+    },
+    {
+      "query_key": "6c19d290-64e9-485c-88ad-4705de60b922",
+      "name": "Unauthenticated access to skills and operations",
+      "description": "Every path from unauthenticated callers to a skill or API operation.",
+      "category": "Access Relationships",
+      "query": "MATCH (s:A2A_PublicAccess), (t) WHERE t:A2A_APIOperation OR t:A2A_Skill\nMATCH p=allShortestPaths((s)-[:A2A_Anonymous|A2A_HasSkill|A2A_BackedBy|A2A_ServesAgent|A2A_CanDelegateTo|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_HoldsCredential|A2A_AuthenticatesTo*1..8]->(t))\nRETURN p"
+    },
+    {
+      "query_key": "b5bf6d87-23a1-4b38-b45a-be1fe8f2df18",
+      "name": "Token issuers to write and delete operations",
+      "description": "Token issuers to write and delete operations.",
+      "category": "Access Relationships",
+      "query": "MATCH (s:A2A_AuthorizationServer), (t:A2A_APIOperation) WHERE t.method IN [\"POST\",\"PUT\",\"PATCH\",\"DELETE\"]\nMATCH p=allShortestPaths((s)-[:A2A_IssuesTokensFor|A2A_DefinesScope|A2A_GrantsAccessTo|A2A_AuthenticatesTo|A2A_HasSkill|A2A_BackedBy*1..6]->(t))\nRETURN p"
+    },
+    {
+      "query_key": "2b565b82-1ada-4405-b429-25a5b15fa5b2",
+      "name": "Unsigned agent cards",
+      "description": "Find unsigned agent cards.",
+      "category": "Inventory",
+      "query": "MATCH (a:A2A_Agent) WHERE a.signed = false RETURN a"
+    },
+    {
+      "query_key": "4b948710-7eed-45b7-aa14-f8dc6b21d6c1",
+      "name": "Agent skills, interfaces, extensions and authentication",
+      "description": "Each agent with its skills, interfaces, extensions and auth.",
+      "category": "Inventory",
+      "query": "MATCH p=(:A2A_Agent)-[:A2A_HasSkill|A2A_ServesAgent|A2A_SupportsExtension|A2A_ProtectedBy|A2A_AuthenticatesTo|A2A_Anonymous]-()\nRETURN p\nLIMIT 500"
+    },
+    {
+      "query_key": "4f022fd4-c155-43f1-b997-21969db234f5",
+      "name": "Agents, skills and API operations",
+      "description": "Agents, skills and the API operations behind them.",
+      "category": "Inventory",
+      "query": "MATCH p=(:A2A_Agent)-[:A2A_HasSkill|A2A_BackedBy*1..2]->()\nRETURN p\nLIMIT 500"
+    },
+    {
+      "query_key": "1b11f27a-8d0c-4301-b4b9-f516b7effa7d",
+      "name": "Agent access to skills and operations",
+      "description": "Every agent to every skill and operation it can reach.",
+      "category": "Access Relationships",
+      "query": "MATCH (s:A2A_Agent), (t) WHERE (t:A2A_Skill OR t:A2A_APIOperation) AND s <> t\nMATCH p=allShortestPaths((s)-[:A2A_HasSkill|A2A_BackedBy|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_HoldsCredential|A2A_AuthenticatesTo|A2A_CanDelegateTo*1..8]->(t))\nRETURN p"
+    },
+    {
+      "query_key": "788de6f9-e109-4707-ac5f-e3ce0aa5ceb5",
+      "name": "Host exposure to agents and skills",
+      "description": "Hosts (servers) to the agents and skills they expose, or what a host compromise reaches.",
+      "category": "Access Relationships",
+      "query": "MATCH (s:A2A_Host), (t:A2A_Skill)\nMATCH p=allShortestPaths((s)-[:A2A_HostsInterface|A2A_ServesAgent|A2A_HostsOperation|A2A_HasSkill|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_CanDelegateTo*1..8]->(t))\nRETURN p"
+    }
+  ]
+}

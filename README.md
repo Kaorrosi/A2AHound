@@ -36,7 +36,9 @@ It then links everything into one graph so you can see your AI agents, their ski
  
 | File | Purpose |
 |---|---|
-| [`extension/schema.json`](extension/schema.json) | OpenGraph extension definition schema. Install it in BloodHound first |
+| [`extension/A2AHound-Community-v1.0.0.zip`](extension/A2AHound-Community-v1.0.0.zip) | Installable Community extension bundle |
+| [`extension/schema.json`](extension/schema.json) | OpenGraph extension definition schema |
+| [`extension/saved_queries.json`](extension/saved_queries.json) | Saved Cypher queries included in the bundle |
 | `a2ahound.py` | Collector: fetches cards and specs and writes a BloodHound payload |
 
  
@@ -44,7 +46,7 @@ It then links everything into one graph so you can see your AI agents, their ski
  
 **Requirements:** Python 3.8+ (standard library only, nothing to install) and BloodHound CE or Enterprise 8.0+ with OpenGraph.
  
-**1. Install the schema.** In BloodHound, go to **Administration → OpenGraph Management** and upload [`extension/schema.json`](extension/schema.json).
+**1. Install the extension.** In BloodHound, go to **Administration → OpenGraph Management** and upload [the extension bundle](extension/A2AHound-Community-v1.0.0.zip). Bundles require BloodHound 9.9 or later. For a schema-only installation, upload [`extension/schema.json`](extension/schema.json).
  
 **2. Collect.**
 
@@ -111,14 +113,8 @@ python3 a2ahound.py ./cards/*.json ./specs/*.json agents.example.com -i targets.
  
 **3. Upload.** In BloodHound, go to **Administration → File Ingest** (or Quick Upload) and upload `a2a.json`.
  
-**4. Explore.** In **Explore → Cypher**, run:
- 
-```cypher
-MATCH p=(a)-[r]->(b) WHERE type(r) STARTS WITH "A2A_" RETURN p
-```
+**4. Explore.** In **Explore → Cypher**, open the extension's saved queries. Start with **Extension graph**.
 
-
- 
 ## Collector options
  
 | Option | What it does |
@@ -135,63 +131,10 @@ MATCH p=(a)-[r]->(b) WHERE type(r) STARTS WITH "A2A_" RETURN p
 | `--no-probe-openapi` | Don't look for OpenAPI specs |
 | `--insecure` | Skip TLS certificate checks |
  
-## Example queries
- 
-Every path from unauthenticated callers to a skill or API operation:
- 
-```cypher
-MATCH (s:A2A_PublicAccess), (t) WHERE t:A2A_APIOperation OR t:A2A_Skill
-MATCH p=allShortestPaths((s)-[:A2A_Anonymous|A2A_HasSkill|A2A_BackedBy|A2A_ServesAgent|A2A_CanDelegateTo|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_HoldsCredential|A2A_AuthenticatesTo*1..8]->(t))
-RETURN p
-```
- 
-Token issuers to write and delete operations:
- 
-```cypher
-MATCH (s:A2A_AuthorizationServer), (t:A2A_APIOperation) WHERE t.method IN ["POST","PUT","PATCH","DELETE"]
-MATCH p=allShortestPaths((s)-[:A2A_IssuesTokensFor|A2A_DefinesScope|A2A_GrantsAccessTo|A2A_AuthenticatesTo|A2A_HasSkill|A2A_BackedBy*1..6]->(t))
-RETURN p
-```
- 
-Unsigned agent cards:
- 
-```cypher
-MATCH (a:A2A_Agent) WHERE a.signed = false RETURN a
-```
- 
-Each agent with its skills, interfaces, extensions and auth:
- 
-```cypher
-MATCH p=(:A2A_Agent)-[:A2A_HasSkill|A2A_ServesAgent|A2A_SupportsExtension|A2A_ProtectedBy|A2A_AuthenticatesTo|A2A_Anonymous]-()
-RETURN p
-LIMIT 500
-```
- 
-Agents, skills and the API operations behind them:
- 
-```cypher
-MATCH p=(:A2A_Agent)-[:A2A_HasSkill|A2A_BackedBy*1..2]->()
-RETURN p
-LIMIT 500
-```
- 
-Every agent to every skill and operation it can reach:
- 
-```cypher
-MATCH (s:A2A_Agent), (t) WHERE (t:A2A_Skill OR t:A2A_APIOperation) AND s <> t
-MATCH p=allShortestPaths((s)-[:A2A_HasSkill|A2A_BackedBy|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_HoldsCredential|A2A_AuthenticatesTo|A2A_CanDelegateTo*1..8]->(t))
-RETURN p
-```
- 
-Hosts (servers) to the agents and skills they expose, or what a host compromise reaches:
- 
-```cypher
-MATCH (s:A2A_Host), (t:A2A_Skill)
-MATCH p=allShortestPaths((s)-[:A2A_HostsInterface|A2A_ServesAgent|A2A_HostsOperation|A2A_HasSkill|A2A_RunsAs|A2A_HasScope|A2A_GrantsAccessTo|A2A_CanDelegateTo*1..8]->(t))
-RETURN p
-```
+## Saved queries
 
- 
+Browse the [saved query source](extension/saved_queries.json) or open it in the [Query Library](https://queries.specterops.io/?source=https%3A%2F%2Fraw.githubusercontent.com%2FKaorrosi%2FA2AHound%2Frefs%2Fheads%2Fmain%2Fextension%2Fsaved_queries.json&sourceLabel=A2AHound).
+
 ## Limitations
  
 - **Card signatures** are recorded but not cryptographically verified (`verified: not_checked`).
