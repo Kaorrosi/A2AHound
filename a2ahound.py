@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 A2AHound collector: turns A2A Agent Cards and OpenAPI documents into a
-BloodHound OpenGraph payload that conforms to a2a-extension-schema.json.
+BloodHound OpenGraph payload that conforms to extension/schema.json.
 
 Targets can be:
   * a host or origin   (example.com, https://agents.example.com)

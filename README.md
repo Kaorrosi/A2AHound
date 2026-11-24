@@ -36,7 +36,7 @@ It then links everything into one graph so you can see your AI agents, their ski
  
 | File | Purpose |
 |---|---|
-| `a2a-extension-schema.json` | OpenGraph extension definition schema. Install it in BloodHound first |
+| [`extension/schema.json`](extension/schema.json) | OpenGraph extension definition schema. Install it in BloodHound first |
 | `a2ahound.py` | Collector: fetches cards and specs and writes a BloodHound payload |
 
  
@@ -44,7 +44,7 @@ It then links everything into one graph so you can see your AI agents, their ski
  
 **Requirements:** Python 3.8+ (standard library only, nothing to install) and BloodHound CE or Enterprise 8.0+ with OpenGraph.
  
-**1. Install the schema.** In BloodHound, go to **Administration → OpenGraph Management** and upload `a2a-extension-schema.json`.
+**1. Install the schema.** In BloodHound, go to **Administration → OpenGraph Management** and upload [`extension/schema.json`](extension/schema.json).
  
 **2. Collect.**
 
